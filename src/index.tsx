@@ -35,41 +35,61 @@ export function apply(ctx: Context) {
 
   ctx
     .command('ow.top <player> [num:number] [platform] [region]', '查询玩家常用英雄')
-    .action(async ({ session }, player, num, platform, region) => {
-      const compData = await ow.getTopHeroes(
-        player,
-        num,
-        GameMode.COMPETITIVE,
-        platform as Plantform,
-        region as Region,
-      );
-      const quickData = await ow.getTopHeroes(
-        player,
-        num,
-        GameMode.QUICKPLAY,
-        platform as Plantform,
-        region as Region,
-      );
-      const comp = compData.map((item) => {
-        return `${ow_i18n?.[cur_i18n]?.[item.name]} ${item.timePlayed}`;
-      });
-      const quick = quickData.map((item) => {
-        return `${ow_i18n?.[cur_i18n]?.[item.name]} ${item.timePlayed}`;
-      });
-      return (
-        <>
-          <p>
-            {player}的 Top {num} 英雄
-          </p>
-          <p>竞技模式：</p>
-          {comp.map((item) => (
-            <p>{item}</p>
-          ))}
-          <p>快速模式：</p>
-          {quick.map((item) => (
-            <p>{item}</p>
-          ))}
-        </>
-      );
-    });
+    .action(
+      async ({ session }, player, num = 5, platform = Plantform.PC, region = Region.GLOBAL) => {
+        const compData = await ow.getTopHeroes(
+          player,
+          num,
+          GameMode.COMPETITIVE,
+          platform as Plantform,
+          region as Region,
+        );
+        const quickData = await ow.getTopHeroes(
+          player,
+          num,
+          GameMode.QUICKPLAY,
+          platform as Plantform,
+          region as Region,
+        );
+        const comp = compData.map((item, index) => {
+          return (
+            <>
+              <p>
+                No{index + 1} {ow_i18n?.[cur_i18n]?.[item.name]}
+              </p>
+              <p>
+                胜场:{item.gamesWon} 时长:{item.timePlayed}
+              </p>
+            </>
+          );
+        });
+        const quick = quickData.map((item, index) => {
+          return (
+            <>
+              <p>
+                No{index + 1} {ow_i18n?.[cur_i18n]?.[item.name]}
+              </p>
+              <p>
+                胜场:{item.gamesWon} 时长:{item.timePlayed}
+              </p>
+            </>
+          );
+        });
+        return (
+          <>
+            <p>
+              {player}的 Top {num} 英雄
+            </p>
+            <p>竞技模式：</p>
+            {comp.map((item) => (
+              <p>{item}</p>
+            ))}
+            <p>快速模式：</p>
+            {quick.map((item) => (
+              <p>{item}</p>
+            ))}
+          </>
+        );
+      },
+    );
 }
